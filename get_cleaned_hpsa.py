@@ -34,3 +34,20 @@ cols_to_drop = ['HPSA ID', 'HPSA Discipline Class', 'PC MCTA Score', 'Primary St
 
 hpsa = hpsa.drop(columns = cols_to_drop)
 
+# Create dictionary for region mapping
+region_map = {
+    'Region 1': 'New England',
+    'Region 2': 'Northeast Corridor',
+    'Region 3': 'Mid Atlantic',
+    'Region 4': 'Southeast',
+    'Region 5': 'Great Lakes',
+    'Region 6': 'South Central',
+    'Region 7': 'Northern Plains',
+    'Region 8': 'Rocky Mountains',
+    'Region 9': 'South Far West',
+    'Region 10': 'North Far West',
+}
+
+# Create a new column for Region Alias
+hpsa['Region Alias'] = hpsa['Common Region Name'].map(region_map)
+
