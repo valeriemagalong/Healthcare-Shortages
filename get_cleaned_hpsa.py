@@ -13,7 +13,8 @@ hpsa = hpsa[hpsa['HPSA Status'] != 'Withdrawn']
 hpsa = hpsa[hpsa['HPSA Component Type Description'] == 'Single County']
 
 # Exclude rows that are NOT the 50 US states (i.e. exclude US territories & insular areas)
-excluded = ['Federated States of Micronesia', 'American Samoa', 'Northern Mariana Islands', 'U.S. Virgin Islands']
+excluded = ['Federated States of Micronesia', 'American Samoa', 'Northern Mariana Islands', 'U.S. Virgin Islands',
+            'Marshall Islands', 'Republic of Palau']
 
 hpsa = hpsa[~hpsa['Common State Name'].isin(excluded)]
 
