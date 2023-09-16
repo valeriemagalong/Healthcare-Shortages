@@ -76,3 +76,9 @@ keys = ['County', 'Common State County FIPS Code', 'Latitude', 'Longitude']
 for key in keys:
     cms[key] = cms['ZIP Code'].apply(lambda x: lookup(str(x), key))
 
+# Replace 'Not Available' values with NaN
+cms['Hospital overall rating'] = cms['Hospital overall rating'].replace('Not Available', pd.NA)
+
+# Change the datatype to Int64 (use Int64 instead of int since there are NaNs)
+cms['Hospital overall rating'] = cms['Hospital overall rating'].astype('Int64')
+
