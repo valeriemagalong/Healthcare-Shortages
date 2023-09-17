@@ -31,6 +31,15 @@ states = ['MS', 'LA', 'AL']
 
 cms = cms[cms['State'].isin(states)]
 
+# Replace state abbrevations in State column with actual state names
+state_mapping = {
+    'AL': 'Alabama',
+    'LA': 'Louisiana',
+    'MS': 'Mississippi'
+}
+
+cms['State'] = cms['State'].replace(state_mapping)
+
 # Get the unique ZIP codes in the cms dataframe
 zips = cms['ZIP Code'].unique()
 
