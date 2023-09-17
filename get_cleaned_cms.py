@@ -1,6 +1,7 @@
 import pandas as pd
 import addfips as af
 from uszipcode import SearchEngine
+from get_ms_la_al import shpsa
 
 # Create a list called files for the string paths to the raw data
 files = ['raw_data/2016_Hospital_General_Information.csv', 'raw_data/2017_Hospital_General_Information.csv',
@@ -90,4 +91,20 @@ cms['Hospital overall rating'] = cms['Hospital overall rating'].replace('Not Ava
 
 # Change the datatype to Int64 (use Int64 instead of int since there are NaNs)
 cms['Hospital overall rating'] = cms['Hospital overall rating'].astype('Int64')
+
+# Get HPSA-designated counties from shpsa dataframe
+hpsa_counties = pd.Series(shpsa['Common State County FIPS Code'].unique())
+
+# Create a column County HPSA Status in the cms dataframe with default values of Non-Shortage Area
+cms['County HPSA Status'] = 'Non-Shortage Area'
+
+# Update the County HPSA Status to Shortage Area for hospitals in shortage areas
+cms.loc[cms['Common State County FIPS Code'].isin(hpsa_counties), 'County HPSA Status'] = 'Shortage Area'
+
+# Identify columns of interest from shpsa, then left join cms with shpsa based on county FIPS code
+join_cols = ['Common State County FIPS Code', 'Designation Type', 'HPSA Score', 'HPSA FTE',
+             'HPSA Designation Population', '% of Population Below 100% Poverty', 'HPSA Formal Ratio',
+             'Rural Status', 'HPSA Provider Ratio Goal', 'HPSA Shortage']
+
+cms = cms.merge(shpsa[join_cols], on = 'Common State County FIPS Code', how = 'left')
 
