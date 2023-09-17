@@ -92,6 +92,9 @@ cms['Hospital overall rating'] = cms['Hospital overall rating'].replace('Not Ava
 # Change the datatype to Int64 (use Int64 instead of int since there are NaNs)
 cms['Hospital overall rating'] = cms['Hospital overall rating'].astype('Int64')
 
+# Convert all values in Facility ID column to string datatype
+cms['Facility ID'] = cms['Facility ID'].astype(str)
+
 # Get HPSA-designated counties from shpsa dataframe
 hpsa_counties = pd.Series(shpsa['Common State County FIPS Code'].unique())
 
