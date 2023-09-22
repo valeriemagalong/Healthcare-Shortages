@@ -78,7 +78,7 @@ for key in keys:
     toc[key] = toc['ZIP Code'].apply(lambda x: lookup(str(x), key))
 
 # Define measures of interest
-measures_to_keep = ['OP_4', 'OP_18b', 'OP_20', 'OP_21', 'OP_22']
+measures_to_keep = ['OP_4', 'OP_18b', 'OP_20', 'OP_21', 'OP_22', 'ED_2b']
 
 # Drop irrelevant rows
 toc = toc[toc['Measure ID'].isin(measures_to_keep)]
@@ -90,7 +90,9 @@ measure_mapping = {
     'Median time to pain med': 'Median Time to Pain Medicine',
     'Left before being seen': '% of Patients Left Before Being Seen',
     'Aspirin at Arrival': 'Median Time to Pain Medicine',
-    'Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better': 'Median Time Spent in ED Before Leaving'
+    'Average (median) time patients spent in the emergency department before leaving from the visit A lower number of minutes is better': 'Median Time Spent in ED Before Leaving',
+    'ED2': 'Median Admit Decision Time to ED Departure Time As Inpatient',
+    'Average (median) time patients spent in the emergency department, after the doctor decided to admit them as an inpatient before leaving the emergency department for their inpatient room A lower number of minutes is better': 'Median Admit Decision Time to ED Departure Time As Inpatient'
 }
 
 toc['Measure Name'] = toc['Measure Name'].replace(measure_mapping)
