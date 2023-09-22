@@ -1,6 +1,7 @@
 import pandas as pd
 import addfips as af
 from uszipcode import SearchEngine
+from get_cleaned_cms import cms
 from get_ms_la_al import shpsa
 
 # Create a list called files for the string paths to the raw data
@@ -102,6 +103,17 @@ toc['Score'] = toc['Score'].astype('float')
 
 # Convert all values in Facility ID column to string datatype
 toc['Facility ID'] = toc['Facility ID'].astype(str)
+
+# Define the hospital type of interest
+acute_types = ['Acute Care Hospitals', 'Acute Care - Veterans Administration', 'Acute Care - Department of Defense']
+
+# Subset the cms dataframe, keeping only rows from acute care hospitals
+acms = cms[cms['Hospital Type'].isin(acute_types)]
+
+acute_facilities = acms['Facility ID'].unique()
+
+# Only keep the rows in toc from acute care facilities
+toc = toc[toc['Facility ID'].isin(acute_facilities)]
 
 # Drop all states except Alabama, Mississippi, & Louisiana
 states = ['Alabama', 'Mississippi', 'Louisiana']
