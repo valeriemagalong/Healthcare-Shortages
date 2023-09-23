@@ -117,6 +117,12 @@ acute_facilities = acms['Facility ID'].unique()
 # Only keep the rows in toc from acute care facilities
 toc = toc[toc['Facility ID'].isin(acute_facilities)]
 
+# Add a column to toc dataframe for Hospital Ownership
+for index, row in toc.iterrows():
+    facility_id = row['Facility ID']
+    matching_row = acms.loc[acms['Facility ID'] == facility_id]
+    toc.at[index, 'Hospital Ownership'] = matching_row['Hospital Ownership'].values[0]
+
 # Drop all states except Alabama, Mississippi, & Louisiana
 states = ['Alabama', 'Mississippi', 'Louisiana']
 
