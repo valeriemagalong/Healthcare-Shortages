@@ -144,3 +144,79 @@ join_cols = ['Common State County FIPS Code', 'Designation Type', 'HPSA Score', 
 
 toc = toc.merge(shpsa[join_cols], on = 'Common State County FIPS Code', how = 'left')
 
+# Import data from AHRQ into dataframe called ahrq
+ahrq = pd.read_excel('raw_data/chsp-compendium-2021.xlsx')
+
+# Only keep rows from MS, AL, & LA
+ahrq = ahrq[ahrq['health_sys_state'].isin(['MS', 'AL', 'LA'])]
+
+# Create hospital mapping, where key is the Facility Name from toc, and value is the corresponding health_sys_name from ahrq
+# Mapping was validated by eye using Excel, checking that the was a match in health system city in AHRQ and CMS .csv files
+hosp_mapping = {
+    'DCH REGIONAL MEDICAL CENTER': 'DCH Health System',
+    'EAST ALABAMA MEDICAL CENTER': 'East Alabama Medical Center',
+    'HUNTSVILLE HOSPITAL': 'Huntsville Hospital Health System',
+    'MOBILE INFIRMARY MEDICAL CENTER': 'Infirmary Health System',
+    'SOUTHEAST HEALTH MEDICAL CENTER': 'Southeast Health',
+    'UAB CALLAHAN EYE HOSPITAL AUTHORITY': 'UAB Health System',
+    'UNIVERSITY OF SOUTH ALABAMA MEDICAL CENTER': 'University of South Alabama Hospitals',
+    'BATON ROUGE GENERAL MEDICAL CENTER': 'Baton Rouge General Health System',
+    'OUR LADY OF THE LAKE REGIONAL MEDICAL CENTER': 'Franciscan Missionaries of Our Lady Health System',
+    'UNIVERSITY MEDICAL CENTER NEW ORLEANS': 'LCMC Health System',
+    'TOURO INFIRMARY': 'LCMC Health System',
+    'NEW ORLEANS EAST HOSPITAL': 'LCMC Health System',
+    'LAKE CHARLES MEMORIAL HOSPITAL': 'Lake Charles Memorial Health System',
+    'NORTH OAKS MEDICAL CENTER, L L C': 'North Oaks Health System',
+    'OCHSNER CLINIC FOUNDATION': 'Ochsner Health System',
+    'OCHSNER MEDICAL CENTER': 'Ochsner Health System',
+    'OCHSNER MEDICAL CENTER - BATON ROUGE': 'Ochsner Health System',
+    'OCHSNER MEDICAL CENTER - NORTHSHORE, L L C': 'Ochsner Health System',
+    'OCHSNER MEDICAL CENTER KENNER': 'Ochsner Health System',
+    'OCHSNER LSU HEALTH MONROE': 'Ochsner Health System',
+    'OCHSNER LSU HEALTH SHREVEPORT': 'Ochsner Health System',
+    'OCHSNER ST MARY': 'Ochsner Health System',
+    'OCHSNER LAFAYETTE GENERAL MEDICAL CENTER': 'Ochsner Health System',
+    'OCHSNER UNIVERSITY HOSPITAL AND CLINICS': 'Ochsner Health System',
+    'OCHSNER AMERICAN LEGION HOSPITAL': 'Ochsner Health System',
+    'SLIDELL MEMORIAL HOSPITAL': 'Slidell Memorial Hospital',
+    'WILLIS KNIGHTON MEDICAL CENTER': 'Willis Knighton Health System',
+    'WILLIS KNIGHTON MEDICAL CENTER, INC': 'Willis Knighton Health System',
+    'ANDERSON REGIONAL MEDICAL CENTER': 'Anderson Regional Health System',
+    'ANDERSON REGIONAL MEDICAL CTR': 'Anderson Regional Health System',
+    'DELTA HEALTH-NORTHWEST REGIONAL': 'Delta Health System',
+    'DELTA HEALTH- THE MEDICAL CENTER': 'Delta Health System',
+    'DELTA HEALTH SYSTEM - THE MEDICAL CENTER': 'Delta Health System',
+    'DELTA HEALTH - HIGHLAND  HILLS': 'Delta Health System',
+    'FORREST GENERAL HOSPITAL': 'Forrest Health',
+    'MARION GENERAL HOSPITAL': 'Forrest Health',
+    'MEMORIAL HOSPITAL AT GULFPORT': 'Memorial Hospital at Gulfport',
+    'NORTH MISSISSIPPI MEDICAL CENTER': 'North Mississippi Health Services',
+    'NORTH MISSISSIPPI MEDICAL CENTER-WEST POINT': 'North Mississippi Health Services',
+    'OCHSNER RUSH HOSPITAL': 'Rush Health Systems',
+    'RUSH FOUNDATION HOSPITAL': 'Rush Health Systems',
+    'SINGING RIVER HEALTH SYSTEM': 'Singing River Health System',
+    'SINGING RIVER GULFPORT': 'Singing River Health System',
+    'SINGING RIVER HOSPITAL': 'Singing River Health System',
+    'UNIVERSITY OF MISSISSIPPI MEDICAL CENTER- GRENADA': 'The University of Mississippi Medical Center',
+    'UNIVERSITY OF MISSISSIPPI MED CENTER': 'The University of Mississippi Medical Center',
+    'SOUTH CENTRAL REG MED CTR': 'South Central Regional Medical Center Health System'
+}
+
+# Define columns in ahrq that I want to keep (keys), and map to final column name (values)
+ahrq_cols = {
+    'total_mds': 'Total MDs in System',
+    'prim_care_mds': 'Total Primary Care MDs in System',
+    'hosp_cnt': 'Total Hospitals in System',
+    'acutehosp_cnt': 'Total Acute Care Hospitals in System',
+    'sys_beds': 'Total Beds in System',
+    'sys_res': 'Total Residents in System'
+}
+
+# Iterate through each Facility Name in toc dataframe, and append new columns from ahrq if there is a match in hosp_mapping
+for col in ahrq_cols.keys():
+    for i in toc.index:
+        facility = toc.loc[i, 'Facility Name']  # Accessing 'Facility Name' column in 'toc'
+        if facility in hosp_mapping:
+            matching_health_sys = ahrq.loc[ahrq['health_sys_name'] == hosp_mapping[facility], col]
+            toc.at[i, ahrq_cols[col]] = matching_health_sys.values[0] if not matching_health_sys.empty else None
+            
